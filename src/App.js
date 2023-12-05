@@ -1,12 +1,12 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./pages/HomePage";
-import Movie from "./pages/MoviePage";
-import TV from "./pages/TVPage";
-import Celebirity from "./pages/CelebirityPage";
-import Header from "./components/common/Header/Header";
-import MovieDetail from "./components/Movie/MovieDetail";
-import NotFound from "./pages/NotFoundPage";
-import Login from "./pages/LoginPage";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Home from './pages/HomePage';
+import Movie from './pages/MoviePage';
+import TV from './pages/TVPage';
+import Celebirity from './pages/CelebirityPage';
+import Header from './components/common/Header/Header';
+import MovieDetail from './components/Movie/MovieDetail';
+import NotFound from './pages/NotFoundPage';
+import Login from './pages/LoginPage';
 
 function App() {
   return (
