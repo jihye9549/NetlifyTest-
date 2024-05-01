@@ -5,7 +5,6 @@ function HomePage() {
   const containerRef = useRef(null);
 
   const [mousePosition, setMousePosition] = useState(undefined);
-
   const [isPainting, setIsPainting] = useState(false);
 
   // 좌표 얻는 함수
@@ -16,10 +15,13 @@ function HomePage() {
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect(); // 캔버스의 절대 위치 정보를 얻습니다.
+    const clientX = event.clientX || event.touches[0].clientX;
+    const clientY = event.clientY || event.touches[0].clientY;
+
     // eslint-disable-next-line consistent-return
     return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
+      x: clientX - rect.left,
+      y: clientY - rect.top,
     };
   };
 
@@ -34,7 +36,6 @@ function HomePage() {
     context.strokeStyle = 'rgba(255, 183, 247, 0.3)';
     context.lineJoin = 'round';
     context.lineWidth = 5;
-    context.globalCompositeOperation = 'source-over';
 
     context.beginPath();
     context.moveTo(originalMousePosition.x, originalMousePosition.y);
@@ -77,70 +78,38 @@ function HomePage() {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
 
+      // 마우스 이벤트 리스너 등록
       canvas.addEventListener('mousedown', startPaint);
       canvas.addEventListener('mousemove', paint);
       canvas.addEventListener('mouseup', exitPaint);
       canvas.addEventListener('mouseleave', exitPaint);
 
+      // 터치 이벤트 리스너 등록
+      canvas.addEventListener('touchstart', startPaint);
+      canvas.addEventListener('touchmove', paint);
+      canvas.addEventListener('touchend', exitPaint);
+
       return () => {
-        // Unmount 시 이벤트 리스터 제거
+        // 이벤트 리스너 제거
         canvas.removeEventListener('mousedown', startPaint);
         canvas.removeEventListener('mousemove', paint);
         canvas.removeEventListener('mouseup', exitPaint);
         canvas.removeEventListener('mouseleave', exitPaint);
+        canvas.removeEventListener('touchstart', startPaint);
+        canvas.removeEventListener('touchmove', paint);
+        canvas.removeEventListener('touchend', exitPaint);
       };
     }
   }, [startPaint, paint, exitPaint]);
 
-  // 캔버스 크기(창) 조정 시 그림이 사라지는 오류 해결을 위해 구현
-  // eslint-disable-next-line consistent-return
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-
-    if (canvas && container === 'blank') {
-      const context = canvas.getContext('2d');
-
-      const resizeCanvas = () => {
-        // 임시 캔버스 생성
-        const tempCanvas = document.createElement('canvas');
-        const tempContext = tempCanvas.getContext('2d');
-
-        // 임시 캔버스 크기 설정 (메인 캔버스의 현재 크기와 동일하게)
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-
-        // (0, 0) 위치에서 시작하여 메인 캔버스의 모든 내용을 임시 캔버스에 복사
-        tempContext.drawImage(canvas, 0, 0);
-
-        // 캔버스 크기 조정
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
-
-        // 캔버스 내용 복원
-        context.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-      };
-
-      // 컨테이너 크기 변경 시마다 콜백 함수(resizeCanvas)를 호출
-      const observer = new ResizeObserver(resizeCanvas);
-      observer.observe(container);
-
-      // 클린업 함수
-      return () => {
-        observer.disconnect();
-      };
-    }
-  }, []);
   return (
     <div ref={containerRef}>
-      dfdf
       <canvas
         ref={canvasRef}
         style={{
           backgroundColor: '#e1e1e1',
-
-          width: '50rem',
-          height: '50rem',
+          width: '100%', // 반응형 디자인을 위해 비율로 설정
+          height: '50vh', // 높이도 비율로 조정
         }}
       />
     </div>
